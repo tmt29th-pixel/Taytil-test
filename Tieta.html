@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام تسجيل الدخول</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        h1 {
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            margin-top: 10px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .message {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+        .success {
+            background: #c6f6d5;
+            color: #38a169;
+            border: 1px solid #9ae6b4;
+        }
+        .info-section {
+            display: none;
+            text-align: right;
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .info-section h2 {
+            color: #4a5568;
+            text-align: center;
+        }
+        .info-item {
+            margin: 10px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+        .locked {
+            display: none;
+            color: #c53030;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>مرحباً بك في نظام تسجيل الدخول</h1>
+        <div id="loginForm">
+            <input type="text" id="usernameInput" placeholder="أدخل اسم المستخدم" required>
+            <input type="password" id="passwordInput" placeholder="أدخل كلمة السر" required>
+            <button onclick="login()">تسجيل الدخول</button>
+            <div id="message"></div>
+            <div id="remainingAttempts"></div>
+        </div>
+        <div id="infoSection" class="info-section">
+            <h2>مرحباً بك!</h2>
+            <div id="userInfo"></div>
+        </div>
+        <div id="lockedMessage" class="message error locked">
+            تم قفل الحساب! جرب مرة أخرى لاحقًا.
+        </div>
+    </div>
+
+    <script>
+        const userData = {
+            "username": "ali",
+            "pass": "1234567",
+            "name": "Ali Ahmed",
+            "age": 21,
+            "mail": "ali@mail.ru",
+            "height": "176 سم",
+            "phone": "+964 771 234 567"
+        };
+
+        let maxAttempts = 3;
+        let attempts = 0;
+
+        function login() {
+            const usernameInput = document.getElementById('usernameInput').value.trim().toLowerCase();
+            const passwordInput = document.getElementById('passwordInput').value.trim().toLowerCase();
+            const messageDiv = document.getElementById('message');
+            const remainingDiv = document.getElementById('remainingAttempts');
+
+            if (!usernameInput || !passwordInput) {
+                showMessage('يرجى إدخال اسم مستخدم وكلمة سر صحيحين (لا تترك فارغًا)!', 'error');
+                return;
+            }
+
+            if (usernameInput === userData.username.toLowerCase() && passwordInput === userData.pass.toLowerCase()) {
+                showSuccess();
+                return;
+            }
+
+            attempts++;
+            const remaining = maxAttempts - attempts;
+
+            if (remaining > 0) {
+                showMessage(`> اسم المستخدم أو كلمة السر خاطئة - (${remaining} محاولات متبقية)`, 'error');
+                remainingDiv.textContent = `(${remaining} محاولات متبقية)`;
+            } else {
+                showLocked();
+            }
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+        }
+
+        function showSuccess() {
+            document.getElementById('loginForm').style.display = 'none';
+            const infoSection = document.getElementById('infoSection');
+            const userInfo = document.getElementById('userInfo');
+            userInfo.innerHTML = `
+                <div class="info-item">الاسم: ${userData.name}</div>
+                <div class="info-item">العمر: ${userData.age}</div>
+                <div class="info-item">البريد الإلكتروني: ${userData.mail}</div>
+                <div class="info-item">الطول: ${userData.height}</div>
+                <div class="info-item">رقم الهاتف: ${userData.phone}</div>
+            `;
+            infoSection.style.display = 'block';
+        }
+
+        function showLocked() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('lockedMessage').style.display = 'block';
+            // محاكاة مسح البيانات
+            // userData = {}; // في الواقع، يمكنك إعادة تعيينه هنا
+        }
+
+        // السماح بتسجيل الدخول عند الضغط على Enter
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                login();
+            }
+        });
+    </script>
+</body>
+</html>
